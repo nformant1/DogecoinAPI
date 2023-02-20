@@ -30,6 +30,14 @@ You will be able to access the documentation in your browser under http://localh
 
 If you want to see the API "live" use this link: http://easypeasy.eastus.cloudapp.azure.com:8080/web/
 
+# :page_with_curl: To Do List
+
+- [ ] Missing RPC Calls
+- [ ] Improve Error Handling
+- [ ] Automate Documentation
+
+And a couple of server tasks (run as a service, SSL, get a domain)
+
 # :flying_saucer: Misc
 
 To get more infos about the API you can use curl in verbose mode:
