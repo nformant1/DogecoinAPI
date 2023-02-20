@@ -28,7 +28,7 @@ You will be able to access the documentation in your browser under http://localh
 
 # :dark_sunglasses: See the results
 
-If you want to see the APIs "live" use this link: http://easypeasy.eastus.cloudapp.azure.com:8080/web/
+If you want to see the API "live" use this link: http://easypeasy.eastus.cloudapp.azure.com:8080/web/
 
 # :flying_saucer: Misc
 
