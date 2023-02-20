@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dogecoin API</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background-color: #333333;
+        color: #FFFFFF;
+        padding: 1em;
+      }
+
+      header h1 {
+        margin: 0;
+      }
+
+      main {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1em;
+      }
+
+      h1, h2, h3 {
+        margin-top: 1.5em;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+
+      h3 {
+        font-size: 1.2em;
+      }
+
+      p {
+        margin-top: 1em;
+      }
+
+      pre {
+        background-color: #F5F5F5;
+        padding: 1em;
+        overflow-x: auto;
+      }
+
+      code {
+        background-color: #F5F5F5;
+        font-family: monospace;
+      }
+      codePad {
+        background-color: #F5F5F5;
+        padding: 0.1em 0.3em;
+        font-family: monospace;
+      }
+      a {
+        color: #333333;
+        text-decoration: none;
+        border-bottom: 1px dotted #333333;
+      }
+
+      a:hover {
+        color: #000000;
+        border-bottom: 1px dotted #000000;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Dogecoin API</h1>
+    </header>
+
+    <main>
+      <h2>Introduction</h2>
+      <p>
+        This is the documentation provides an overview of all API endpoints supported and how to use them.
+      </p>
+
+      <p>
+        Call the API like this <code>http://easypeasy.eastus.cloudapp.azure.com:8080/api/blockchain/getblockcount</code>
+      </p>
+
+      <h2>Blockchain</h2>
+      <h3>getbestblockhash</h3>
+      <p>Returns the hash of the best (tip) block in the longest blockchain.</p>
+      <pre><code>Endpoint:  /api/blockchain/getbestblockhash
+Result:    "hex"      (string) the block hash hex encoded
+Example:   "ebbbd5db0b0c73a9640a354da6fe2bc6647bb94cddb3674ca451651c8df1e656"
+</code></pre>
+
+<h3>getblockchaininfo</h3>
+      <p>Returns an object containing various state info regarding blockchain processing.</p>
+      <pre><code>Endpoint:  /api/blockchain/getblockchaininfo
+Result:    "hex"      (string) the block hash hex encoded
+Result:
+{
+  "chain": "xxxx",        (string) current network name as defined in BIP70 (main, test, regtest)
+  "blocks": xxxxxx,         (numeric) the current number of blocks processed in the server
+  "headers": xxxxxx,        (numeric) the current number of headers we have validated
+  "bestblockhash": "...", (string) the hash of the currently best block
+  "difficulty": xxxxxx,     (numeric) the current difficulty
+  "mediantime": xxxxxx,     (numeric) median time for the current best block
+  "verificationprogress": xxxx, (numeric) estimate of verification progress [0..1]
+  "initialblockdownload": xxxx, (bool) (debug information) estimate of whether this node is in Initial Block Download mode.
+  "chainwork": "xxxx"     (string) total amount of work in active chain, in hexadecimal
+  "size_on_disk": xxxxxx,   (numeric) the estimated size of the block and undo files on disk
+  "pruned": xx,             (boolean) if the blocks are subject to pruning
+  "pruneheight": xxxxxx,    (numeric) lowest-height complete block stored (only present if pruning is enabled)
+  "automatic_pruning": xx,  (boolean) whether automatic pruning is enabled (only present if pruning is enabled)
+  "prune_target_size": xxxxxx,  (numeric) the target size used by pruning (only present if automatic pruning is enabled)
+  "softforks": [            (array) status of softforks in progress
+     {
+        "id": "xxxx",        (string) name of softfork
+        "version": xx,         (numeric) block version
+        "reject": {            (object) progress toward rejecting pre-softfork blocks
+           "status": xx,       (boolean) true if threshold reached
+        },
+     }, ...
+  ],
+  "bip9_softforks": {          (object) status of BIP9 softforks in progress
+     "xxxx" : {                (string) name of the softfork
+        "status": "xxxx",    (string) one of "defined", "started", "locked_in", "active", "failed"
+        "bit": xx,             (numeric) the bit (0-28) in the block version field used to signal this softfork (only for "started" status)
+        "startTime": xx,       (numeric) the minimum median time past of a block at which the bit gains its meaning
+        "timeout": xx,         (numeric) the median time past of a block at which the deployment is considered failed if not yet locked in
+        "since": xx            (numeric) height of the first block to which the status applies
+     }
+  }
+}
+
+Example:
+{
+    "chain":"main",
+    "blocks":4157976,
+    "headers":4602424,
+    "bestblockhash":"51c006b75a0c583f9616d9e930330715532aa4fc920c3ac6b238d0efefc5668d",
+    "difficulty":6489183.761088323,
+    "mediantime":1648295043,
+    "verificationprogress":0.9097562572712794,
+    "initialblockdownload":true,
+    "chainwork":"0000000000000000000000000000000000000000000006f6e99cd881f6f9bbf9",
+    "size_on_disk":55343545939,
+    "pruned":false,
+    "softforks":[
+        {
+            "id":"bip34",
+            "version":2,
+            "reject":{
+                "status":true
+            }
+        },
+        {
+            "id":"bip66",
+            "version":3,
+            "reject":{
+                "status":true
+            }
+        },
+        {
+            "id":"bip65",
+            "version":4,
+            "reject":{
+                "status":true
+            }
+        }
+    ],
+    "bip9_softforks":{
+        "csv":{
+            "status":"failed",
+            "startTime":1462060800,
+            "timeout":1493596800,
+            "since":1703520
+        }
+    },
+    "warnings":""
+}
+</code></pre>
+
+<h3>getblockcount</h3>
+      <p>getblockhash height</p>
+
+      <p>Returns hash of block in best-block-chain at height provided.</p>
+      <pre><code>Endpoint:  /api/blockchain/getblockhash/height
+Arguments:
+1. height         (numeric, required) The height index
+
+Result:
+"hash"         (string) The block hash
+
+Examples:
+</code></pre>
+
+<h3>getblockhash</h3>
+      <p>Returns the number of blocks in the longest blockchain.</p>
+      <pre><code>Endpoint:  /api/blockchain/getblockcount
+Result:
+n    (numeric) The current block count
+Example: 
+4226333
+</code></pre>
+
+
+<h2>Rawtransactions</h2>
+      <h3>decoderawtransaction</h3>
+      <p>Return a JSON object representing the serialized, hex-encoded transaction.</p>
+      <pre><code>Endpoint:  /api/rawtransactions/decoderawtransaction/hexstring
+Arguments:
+1. "hexstring"      (string, required) The transaction hex string
+
+Result:
+{
+  "txid" : "id",        (string) The transaction id
+  "hash" : "id",        (string) The transaction hash (differs from txid for witness transactions)
+  "size" : n,             (numeric) The transaction size
+  "vsize" : n,            (numeric) The virtual transaction size (differs from size for witness transactions)
+  "version" : n,          (numeric) The version
+  "locktime" : ttt,       (numeric) The lock time
+  "vin" : [               (array of json objects)
+      {
+        "txid": "id",    (string) The transaction id
+        "vout": n,         (numeric) The output number
+        "scriptSig": {     (json object) The script
+          "asm": "asm",  (string) asm
+          "hex": "hex"   (string) hex
+        },
+        "txinwitness": ["hex", ...] (array of string) hex-encoded witness data (if any)
+        "sequence": n     (numeric) The script sequence number
+      }
+      ,...
+  ],
+  "vout" : [             (array of json objects)
+      {
+        "value" : x.xxx,            (numeric) The value in DOGE
+        "n" : n,                    (numeric) index
+        "scriptPubKey" : {          (json object)
+          "asm" : "asm",          (string) the asm
+          "hex" : "hex",          (string) the hex
+          "reqSigs" : n,            (numeric) The required sigs
+          "type" : "pubkeyhash",  (string) The type, eg 'pubkeyhash'
+          "addresses" : [           (json array of string)
+            "D731rRTrFydjJdZCKNzfB5go229p59GUGD"   (string) dogecoin address
+            ,...
+          ]
+        }
+      }
+      ,...
+  ],
+}
+
+Example:
+...
+</code></pre>
+
+<h3>decodescript</h3>
+      <p>Return a JSON object representing the serialized, hex-encoded transaction.</p>
+      <pre><code>Endpoint:  /api/rawtransactions/decodescript/hexstring
+Decode a hex-encoded script.
+
+Arguments:
+1. "hexstring"     (string) the hex encoded script
+
+Result:
+{
+  "asm":"asm",   (string) Script public key
+  "hex":"hex",   (string) hex encoded public key
+  "type":"type", (string) The output type
+  "reqSigs": n,    (numeric) The required signatures
+  "addresses": [   (json array of string)
+      "address"     (string) dogecoin address
+      ,...
+  ],
+  "p2sh","address" (string) address of P2SH script wrapping this redeem script (not returned if the script is already a P2SH).
+}
+
+Examples:
+> dogecoin-cli decodescript "hexstring"
+> curl --user myusername --data-binary '{"jsonrpc": "1.0", "id":"curltest", "method": "decodescript", "params": ["hexstring"] }' -H 'content-type: text/plain;' http://127.0.0.1:22555/
+
+Example:
+...
+</code></pre>
+
+
+<h3>getrawtransaction</h3>
+      <p>NOTE: By default this function only works for mempool transactions. If the -txindex option is enabled, it also works for blockchain transactions.</p>
+      <p>DEPRECATED: for now, it also works for transactions with unspent outputs.</p>
+      <p></p>
+      <p>Return the raw transaction data.</p>
+      <p></p>
+      <p>If verbose is 'true', returns an Object with information about 'txid'.</p>
+      <p>If verbose is 'false' or omitted, returns a string that is serialized, hex-encoded data for 'txid'.</p>
+      <p></p>
+      <p>Arguments:</p>
+      <p>1. "txid"      (string, required) The transaction id</p>
+      <p>Always in verbose mode!</p>
+      </p>
+      <p>Result (if verbose is not set or set to false):</p>
+      <p>"data"      (string) The serialized, hex-encoded data for 'txid'</p>
+      <pre><code>Endpoint:  /api/rawtransactions/getrawtransaction/txid
+Result:
+{
+  "hex" : "data",       (string) The serialized, hex-encoded data for 'txid'
+  "txid" : "id",        (string) The transaction id (same as provided)
+  "hash" : "id",        (string) The transaction hash (differs from txid for witness transactions)
+  "size" : n,             (numeric) The serialized transaction size
+  "vsize" : n,            (numeric) The virtual transaction size (differs from size for witness transactions)
+  "version" : n,          (numeric) The version
+  "locktime" : ttt,       (numeric) The lock time
+  "vin" : [               (array of json objects)
+      {
+        "txid": "id",    (string) The transaction id
+        "vout": n,         (numeric) 
+        "scriptSig": {     (json object) The script
+          "asm": "asm",  (string) asm
+          "hex": "hex"   (string) hex
+        },
+        "sequence": n      (numeric) The script sequence number
+        "txinwitness": ["hex", ...] (array of string) hex-encoded witness data (if any)
+      }
+      ,...
+  ],
+  "vout" : [              (array of json objects)
+      {
+        "value" : x.xxx,            (numeric) The value in DOGE
+        "n" : n,                    (numeric) index
+        "scriptPubKey" : {          (json object)
+          "asm" : "asm",          (string) the asm
+          "hex" : "hex",          (string) the hex
+          "reqSigs" : n,            (numeric) The required sigs
+          "type" : "pubkeyhash",  (string) The type, eg 'pubkeyhash'
+          "addresses" : [           (json array of string)
+            "address"        (string) dogecoin address
+            ,...
+          ]
+        }
+      }
+      ,...
+  ],
+  "blockhash" : "hash",   (string) the block hash
+  "confirmations" : n,      (numeric) The confirmations
+  "time" : ttt,             (numeric) The transaction time in seconds since epoch (Jan 1 1970 GMT)
+  "blocktime" : ttt         (numeric) The block time in seconds since epoch (Jan 1 1970 GMT)
+}
+
+Examples:
+...
+</code></pre>
+
+
+
+<h3>sendrawtransaction</h3>
+      <p>Submits raw transaction (serialized, hex-encoded) to local node and network.
+
+        Also see createrawtransaction and signrawtransaction calls.
+        
+        Arguments:
+        1. "hexstring"    (string, required) The hex string of the raw transaction)
+        allowhighfees is always false
+        </p>
+      <pre><code>Result:
+"hex"             (string) The transaction hash in hex
+
+Examples:
+...
+</code></pre>
+<!---
+<h3>getblockhash <i>height</i></h3>
+      <p>Returns the number of blocks in the longest getblockhash.</p>
+      <pre><code>Endpoint:  /api/blockchain/getblockcount
+Returns hash of block in best-block-chain at height provided.
+
+Arguments:
+1. height         (numeric, required) The height index
+
+Result:
+"hash"         (string) The block hash
+
+Example:
+
+</code></pre>
+-->
+<!---
+     <ol>
+        <li>Download the project files from <a href="#">GitHub</a>.</li>
+        <li>Install the required dependencies by running <code>npm install</code>.</li>
+        <li>Configure the project by editing the <code>config.json</code> file.</li>
+        <li>Run the project by running <code>npm start</code>.</li>
+      </ol>
+-->
+ </main>
+ </body>
+ </html>
