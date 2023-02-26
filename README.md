@@ -24,17 +24,21 @@ rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
 To run the the API endpoints just fire up this python script
 ``python main.py``
 
-You will be able to access the documentation in your browser under http://localhost:8080/web
+You will be able to access the documentation in your browser under http://localhost
 
 # :dark_sunglasses: See the results
 
-If you want to see the API "live" use this link: http://easypeasy.eastus.cloudapp.azure.com:8080/web/
+If you want to see the API "live" use this link: http://easypeasy.eastus.cloudapp.azure.com/
 
 # :page_with_curl: To Do List
 
 - [ ] Missing RPC Calls
 - [ ] Improve Error Handling
-- [ ] Automate Documentation
+- [X] Automate Documentation
+- [ ] DOS Protection
+- [ ] Log stats
+- [ ] Cache data (frequent queries)
+
 
 And a couple of server tasks (run as a service, SSL, get a domain)
 
@@ -42,7 +46,7 @@ And a couple of server tasks (run as a service, SSL, get a domain)
 
 To get more infos about the API you can use curl in verbose mode:
 
-``curl easypeasy.eastus.cloudapp.azure.com:8080/api/blockchain/getblockcount -v``
+``curl http://easypeasy.eastus.cloudapp.azure.com/api/blockchain/getrawmempool -v``
 
 ---
 
