@@ -3,7 +3,7 @@ from fastapi import Request
 #from fastapi.responses import HTMLResponse
 import uvicorn
 from rpc_connection import RPC_Connection
-
+from fastapi.middleware.cors import CORSMiddleware
 #from fastapi.staticfiles import StaticFiles
 #from fastapi.responses import JSONResponse
 
@@ -22,6 +22,7 @@ rpcpassword = "rpcpassword"
 rpcport = 22555
 
 
+
 app = FastAPI(
     title="DogeAPI",
     description='''Welcome to our fully unsupported online service that answers all your blockchain queries faster than the time it takes for a Bitcoin transaction to confirm! Our service is so fast, you'll be able to check the status of the Dogecoin network before Elon Musk has time to tweet about it. So whether you want to know the current mempool or check if your grandma's P2SH scripts still work, we've got you covered!
@@ -33,6 +34,25 @@ This service comes without warranty. Use at own risk. Only hobby project (:
     docs_url=None
 )
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+"""@app.exception_handler(UnicornException)
+async def unicorn_exception_handler(request: Request, exc: UnicornException):
+    return JSONResponse(
+        status_code=418,
+        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+    )
+"""
+
+#app.mount('/web', StaticFiles(directory='static',html=True))
 
 #@app.get("/api/blockchain/getbestblockhash", response_model=BestBlockhash)
 @app.get("/api/blockchain/getbestblockhash")
@@ -212,6 +232,31 @@ def get_raw_mempool():
         raise HTTPException(status_code=418, detail="Something went wrong")
 
 
+"""    
+
+How to handle second parameter?
+
+@app.get("/api/blockchain/gettxout/{txid}")
+async def get_txout(txid):
+    
+    #Returns details about an unspent transaction output.
+    
+    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    data = {}
+    try:
+        data = rpc.command("gettxout", params=[txid])
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=418, detail="Something went wrong")
+"""
+
+#gettxoutproof
+#gettxoutsetinfo
+#preciousblock "blockhash"
+#pruneblockchain
+#verifychain ( checklevel nblocks )
+#verifytxoutproof "proof"
+
 # CONTROL
 @app.get("/api/blockchain/getinfo")
 def get_info():
@@ -269,6 +314,17 @@ def get_net_totals():
         return data
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
+
+
+#== Rawtransactions ==
+#createrawtransaction [{"txid":"id","vout":n},...] {"address":amount,"data":"hex",...} ( locktime )
+#fundrawtransaction "hexstring" ( options )
+#getrawtransaction "txid" ( verbose )
+#sendrawtransaction "hexstring" ( allowhighfees )
+#signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
+
+
+
     
 @app.get("/api/rawtransactions/decoderawtransaction/{hexstring}")
 async def decode_rawtransaction(hexstring):
@@ -281,6 +337,7 @@ async def decode_rawtransaction(hexstring):
         data = rpc.command("decoderawtransaction", params=[hexstring])
         return data
     except Exception as e:
+        #raise UnicornException(name="getbestblockhash")
         print (e)
         raise HTTPException(status_code=418, detail="Something went wrong")
 
@@ -322,7 +379,57 @@ async def send_rawtransaction(hexstring):
 
 
 
+
+# UTIL
+@app.get("/api/rawtransactions/validateaddress/{address}")
+async def validate_address(address):
+    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    data = {}
+    try:
+        data = rpc.command("validateaddress", params=[address])
+        return data
+    except Exception as e:
+        #raise UnicornException(name="getbestblockhash")
+        print (e)
+        raise HTTPException(status_code=418, detail="Something went wrong")
+
+"""@app.get("/api/rawtransactions/verifymessage/")
+async def verify_message(signature: str, mes: str):
+    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    data = {}
+    print ("S: " + signature)
+    print ("M: " + mes)
+    try:
+        data = rpc.command("verifymessage", params=[signature, mes])
+        return data
+    except Exception as e:
+        #raise UnicornException(name="getbestblockhash")
+        print (e)
+        raise HTTPException(status_code=418, detail="Something went wrong")"""
+
+
+"""
+@app.get("/api/test")
+def read_root():
+    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    try:
+        data = rpc.command("getbestblockhash")
+        return data
+    except:
+        #raise UnicornException(name="getbestblockhash")
+        raise HTTPException(status_code=418, detail="Something went wrong")
+"""
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=80, log_level="debug", reload=True)
+    #uvicorn.run("main:app", host="0.0.0.0", port=80, log_level="debug", reload=True)
+    uvicorn.run("main:app",
+                host="0.0.0.0",
+                log_level="debug",
+                port=443,
+                reload=True
+                ,ssl_keyfile="C:\\Certbot\\live\\easypeasy.eastus.cloudapp.azure.com\\privkey.pem"
+                ,ssl_certfile="C:\\Certbot\\live\\easypeasy.eastus.cloudapp.azure.com\\fullchain.pem"
+                )
+
     #freeze_support()
     #uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="info", reload=False,workers=4,loop="asyncio",)
