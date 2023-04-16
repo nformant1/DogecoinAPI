@@ -393,22 +393,20 @@ async def validate_address(address):
         print (e)
         raise HTTPException(status_code=418, detail="Something went wrong")
 
-"""@app.get("/api/rawtransactions/verifymessage/")
-async def verify_message(signature: str, mes: str):
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+@app.get("/api/rawtransactions/verifymessage")
+def verify_message(address: str, signature: str, mes: str):
+    """
+    Verify a signed message.
+    """
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
-    print ("S: " + signature)
-    print ("M: " + mes)
     try:
-        data = rpc.command("verifymessage", params=[signature, mes])
+        data = rpc.command("verifymessage", params=[address, signature, mes])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
-        raise HTTPException(status_code=418, detail="Something went wrong")"""
+        raise HTTPException(status_code=418, detail="Something went wrong")
 
-
-"""
+"""        
 @app.get("/api/test")
 def read_root():
     rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
