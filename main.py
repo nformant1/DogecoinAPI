@@ -20,7 +20,7 @@ class UnicornException(Exception):
 rpcuser = "rpcuser"
 rpcpassword = "rpcpassword"
 rpcport = 22555
-
+rpchost = "127.0.0.1"
 
 
 app = FastAPI(
@@ -60,7 +60,7 @@ def get_best_blockhash():
     """
     Returns the hash of the best (tip) block in the longest blockchain.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     try:
         data = rpc.command("getbestblockhash")
         #return BestBlockhash(best_blockhash=data)
@@ -75,7 +75,7 @@ async def get_block(hashval):
     Returns an Object with information about block <hash>.
     Always in "verbose" mode.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     try:
         print (hashval)
         data = rpc.command("getblock", params=[hashval])
@@ -88,7 +88,7 @@ def get_blockchain_info():
     """
     Returns an object containing various state info regarding blockchain processing.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getblockchaininfo")
@@ -101,7 +101,7 @@ def get_blockcount():
     """
     Returns the number of blocks in the longest blockchain.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getblockcount")
@@ -116,7 +116,7 @@ async def get_blockhash(height):
     """
     Returns hash of block in best-block-chain at height provided.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         #print (height)
@@ -131,7 +131,7 @@ async def get_blockheader(hashval):
     Returns an Object with information about blockheader <hash>.
     Always in "verbose" mode.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     #data = {}
     try:
         data = rpc.command("getblockheader", params=[hashval])
@@ -145,7 +145,7 @@ def get_chaintips():
     """
     Return information about all known tips in the block tree, including the main chain as well as orphaned branches.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getchaintips")
@@ -158,7 +158,7 @@ def get_difficulty():
     """
     Returns the proof-of-work difficulty as a multiple of the minimum difficulty.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getdifficulty")
@@ -171,7 +171,7 @@ async def get_mempool_ancestors(txid):
     """
     If txid is in the mempool, returns all in-mempool ancestors.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getmempoolancestors", params=[txid])
@@ -184,7 +184,7 @@ async def get_mempool_descendants(txid):
     """
     If txid is in the mempool, returns all in-mempool descendants.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getmempooldescendants", params=[txid])
@@ -197,7 +197,7 @@ async def get_mempool_entry(txid):
     """
     Returns mempool data for given transaction.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getmempoolentry", params=[txid])
@@ -210,7 +210,7 @@ def get_mempool_info():
     """
     Returns details on the active state of the TX memory pool.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getmempoolinfo")
@@ -223,7 +223,7 @@ def get_raw_mempool():
     """
     Returns all transaction ids in memory pool as a json array of string transaction ids.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getrawmempool")
@@ -231,24 +231,18 @@ def get_raw_mempool():
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
-
-"""    
-
-How to handle second parameter?
-
-@app.get("/api/blockchain/gettxout/{txid}")
-async def get_txout(txid):
-    
-    #Returns details about an unspent transaction output.
-    
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+@app.get("/api/blockchain/gettxout/{txid}/{n}")
+def get_txout(txid: str, n: int):
+    """
+    Returns details about an unspent transaction output.
+    """
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
-        data = rpc.command("gettxout", params=[txid])
+        data = rpc.command("gettxout", params=[txid, n])
         return data
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
-"""
 
 #gettxoutproof
 #gettxoutsetinfo
@@ -263,7 +257,7 @@ def get_info():
     """
     DEPRECATED. Returns an object containing various state info.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getinfo")
@@ -276,7 +270,7 @@ def help_all():
     """
     List all commands, or get help for a specified command.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("help")
@@ -288,7 +282,7 @@ async def help(command):
     """
     List all commands, or get help for a specified command.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     print (command)
     try:
@@ -307,7 +301,7 @@ def get_net_totals():
     """
     Returns all transaction ids in memory pool as a json array of string transaction ids.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getnettotals")
@@ -331,7 +325,7 @@ async def decode_rawtransaction(hexstring):
     """"
     Returns an Object with information about blockheader <hash>.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("decoderawtransaction", params=[hexstring])
@@ -343,7 +337,7 @@ async def decode_rawtransaction(hexstring):
 
 @app.get("/api/rawtransactions/decodescript/{hexstring}")
 async def decode_script(hexstring):
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("decodescript", params=[hexstring])
@@ -355,7 +349,7 @@ async def decode_script(hexstring):
 
 @app.get("/api/rawtransactions/getrawtransaction/{txid}")
 async def get_rawtransaction(txid):
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("getrawtransaction", params=[txid, True])
@@ -367,7 +361,7 @@ async def get_rawtransaction(txid):
 
 @app.get("/api/rawtransactions/sendrawtransaction/{hexstring}")
 async def send_rawtransaction(hexstring):
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("sendrawtransaction", params=[hexstring])
@@ -383,7 +377,7 @@ async def send_rawtransaction(hexstring):
 # UTIL
 @app.get("/api/rawtransactions/validateaddress/{address}")
 async def validate_address(address):
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     try:
         data = rpc.command("validateaddress", params=[address])
@@ -395,7 +389,7 @@ async def validate_address(address):
 
 """@app.get("/api/rawtransactions/verifymessage/")
 async def verify_message(signature: str, mes: str):
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
     print ("S: " + signature)
     print ("M: " + mes)
@@ -411,7 +405,7 @@ async def verify_message(signature: str, mes: str):
 """
 @app.get("/api/test")
 def read_root():
-    rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     try:
         data = rpc.command("getbestblockhash")
         return data
