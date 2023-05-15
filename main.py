@@ -16,6 +16,13 @@ class UnicornException(Exception):
     def __init__(self, name: str):
         self.name = name
 
+# Models for parameters
+class Verifymessage(BaseModel):
+    address: str
+    signature: str
+    message: str
+	
+        
 # credentials for dogecoin node
 rpcuser = "rpcuser"
 rpcpassword = "rpcpassword"
@@ -387,19 +394,34 @@ async def validate_address(address):
         print (e)
         raise HTTPException(status_code=418, detail="Something went wrong")
 
-"""@app.get("/api/rawtransactions/verifymessage/")
-async def verify_message(signature: str, mes: str):
+	
+@app.post("/api/rawtransactions/verifymessage")
+def verify_message(verifyMessage: Verifymessage):
+    """
+    Verify a signed message.
+    1. "address"         (string, required) The dogecoin address to use for the signature.
+    2. "signature"       (string, required) The signature provided by the signer in base 64 encoding (see signmessage).
+    3. "message"         (string, required) The message that was signed.
+
+    Example:
+     curl -X 'POST' \
+        'https://easypeasy.eastus.cloudapp.azure.com/api/rawtransactions/verifymessage' \
+        -H 'accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d '{
+            "address": "D6sFXiE9gobpPfSSjEWZcMXT8LADLigMn9",
+            "signature": "HzdtnvCQFAY3SijChINYs4aWNBxVW4Fm+41BJisBBkDod+cbW21MxQ5nl8gAxWoGM1EUAL2wg2xB0LpLBx7+ELA=",
+            "message": "To the moon (:"
+        }'
+    """
     rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
     data = {}
-    print ("S: " + signature)
-    print ("M: " + mes)
     try:
-        data = rpc.command("verifymessage", params=[signature, mes])
+        data = rpc.command("verifymessage", params=[verifyMessage.address,verifyMessage.signature, verifyMessage.message])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
-        raise HTTPException(status_code=418, detail="Something went wrong")"""
+        raise HTTPException(status_code=418, detail="Something went wrong")
+        
 
 
 """
