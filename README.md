@@ -11,6 +11,7 @@ You will need to set those variables in main.py:
 rpcuser = "rpcuser"
 rpcpassword = "rpcpassword"
 rpcport = 22555
+rpchost = "127.0.0.1"
 ````
 
 The port is the standard port but must be defined. Password and username must be defined in your ``dogecoin.conf``
@@ -18,7 +19,7 @@ The port is the standard port but must be defined. Password and username must be
 If you don't run your node on the same machine make sure to also change the IP address here:
 ````
 # new connection
-rpc = RPC_Connection(rpcuser, rpcpassword, "127.0.0.1",rpcport)
+rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
 ````
 
 To run the the API endpoints just fire up this python script
