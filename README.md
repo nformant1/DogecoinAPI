@@ -53,7 +53,7 @@ You will be able to access the documentation in your browser under the specified
 
 ## 🕶 See the results
 
-If you want to see the API "live" use this link: <http://easypeasy.eastus.cloudapp.azure.com/>
+If you want to see the API "live" use this link: <https://easypeasy.eastus.cloudapp.azure.com/>
 
 ## 📃 To Do List
 
