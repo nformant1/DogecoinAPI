@@ -1,4 +1,5 @@
-import base64, json
+import base64
+import json
 from http.client import HTTPConnection
 
 
@@ -19,7 +20,7 @@ class RPC_Connection:
         else:
             obj["params"] = params
 
-        print ("POST "+"/ "+ str(json.dumps(obj)) )
+        print("POST "+"/ " + str(json.dumps(obj)))
         self.conn.request(
             "POST",
             "/",
@@ -31,7 +32,6 @@ class RPC_Connection:
         if resp is None:
             print("JSON-RPC: no response")
             return None
-
         body = resp.read()
         resp_obj = json.loads(body)
 
@@ -46,5 +46,5 @@ class RPC_Connection:
             print("JSON-RPC: no result in object")
             return None
 
-        print (resp_obj["result"])
+        print(resp_obj["result"])
         return resp_obj["result"]

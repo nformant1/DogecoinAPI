@@ -1,33 +1,24 @@
-from fastapi import FastAPI, HTTPException
-from fastapi import Request
-#from fastapi.responses import HTMLResponse
+import logging
 import uvicorn
-from rpc_connection import RPC_Connection
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-#from fastapi.staticfiles import StaticFiles
-#from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
-#from models import BestBlockhash
+import config
+from rpc_connection import RPC_Connection
 
-from multiprocessing import cpu_count, freeze_support
-#import time
 
 class UnicornException(Exception):
     def __init__(self, name: str):
         self.name = name
 
 # Models for parameters
+
+
 class Verifymessage(BaseModel):
     address: str
     signature: str
     message: str
-	
-        
-# credentials for dogecoin node
-rpcuser = "rpcuser"
-rpcpassword = "rpcpassword"
-rpcport = 22555
-rpchost = "127.0.0.1"
 
 
 app = FastAPI(
@@ -59,22 +50,26 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 """
 
-#app.mount('/web', StaticFiles(directory='static',html=True))
+# app.mount('/web', StaticFiles(directory='static',html=True))
 
-#@app.get("/api/blockchain/getbestblockhash", response_model=BestBlockhash)
+# @app.get("/api/blockchain/getbestblockhash", response_model=BestBlockhash)
+
+
 @app.get("/api/blockchain/getbestblockhash")
 def get_best_blockhash():
     """
     Returns the hash of the best (tip) block in the longest blockchain.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     try:
-        data = rpc.command("getbestblockhash")
-        #return BestBlockhash(best_blockhash=data)
+        data = rpc.command(method="getbestblockhash")
+        # return BestBlockhash(best_blockhash=data)
         return data
-    except:
+    except Exception as e:
+        logging.error(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
-    
+
 
 @app.get("/api/blockchain/getblock/{hashval}")
 async def get_block(hashval):
@@ -82,20 +77,23 @@ async def get_block(hashval):
     Returns an Object with information about block <hash>.
     Always in "verbose" mode.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     try:
-        print (hashval)
+        print(hashval)
         data = rpc.command("getblock", params=[hashval])
         return data
     except:
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/blockchain/getblockchaininfo")
 def get_blockchain_info():
     """
     Returns an object containing various state info regarding blockchain processing.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getblockchaininfo")
@@ -103,34 +101,39 @@ def get_blockchain_info():
     except:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/getblockcount")
 def get_blockcount():
     """
     Returns the number of blocks in the longest blockchain.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getblockcount")
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        #print (e)
+        # raise UnicornException(name="getbestblockhash")
+        # print (e)
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/blockchain/getblockhash/{height}")
 async def get_blockhash(height):
     """
     Returns hash of block in best-block-chain at height provided.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
-        #print (height)
+        # print (height)
         data = rpc.command("getblockhash", params=[int(height)])
         return data
     except:
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/blockchain/getblockheader/{hashval}")
 async def get_blockheader(hashval):
@@ -138,34 +141,39 @@ async def get_blockheader(hashval):
     Returns an Object with information about blockheader <hash>.
     Always in "verbose" mode.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
-    #data = {}
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
+    # data = {}
     try:
         data = rpc.command("getblockheader", params=[hashval])
         return data
     except Exception as e:
-        print (e)
+        print(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/blockchain/getchaintips")
 def get_chaintips():
     """
     Return information about all known tips in the block tree, including the main chain as well as orphaned branches.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getchaintips")
         return data
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
-    
+
+
 @app.get("/api/blockchain/getdifficulty")
 def get_difficulty():
     """
     Returns the proof-of-work difficulty as a multiple of the minimum difficulty.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getdifficulty")
@@ -173,12 +181,14 @@ def get_difficulty():
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/getmempoolancestors/{txid}")
 async def get_mempool_ancestors(txid):
     """
     If txid is in the mempool, returns all in-mempool ancestors.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getmempoolancestors", params=[txid])
@@ -186,12 +196,14 @@ async def get_mempool_ancestors(txid):
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/getmempooldescendants/{txid}")
 async def get_mempool_descendants(txid):
     """
     If txid is in the mempool, returns all in-mempool descendants.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getmempooldescendants", params=[txid])
@@ -199,12 +211,14 @@ async def get_mempool_descendants(txid):
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/getmempoolentry/{txid}")
 async def get_mempool_entry(txid):
     """
     Returns mempool data for given transaction.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getmempoolentry", params=[txid])
@@ -212,12 +226,14 @@ async def get_mempool_entry(txid):
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/getmempoolinfo")
 def get_mempool_info():
     """
     Returns details on the active state of the TX memory pool.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getmempoolinfo")
@@ -225,12 +241,14 @@ def get_mempool_info():
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/getrawmempool")
 def get_raw_mempool():
     """
     Returns all transaction ids in memory pool as a json array of string transaction ids.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getrawmempool")
@@ -238,12 +256,14 @@ def get_raw_mempool():
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
+
 @app.get("/api/blockchain/gettxout/{txid}/{n}")
 def get_txout(txid: str, n: int):
     """
     Returns details about an unspent transaction output.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("gettxout", params=[txid, n])
@@ -251,47 +271,55 @@ def get_txout(txid: str, n: int):
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
 
-#gettxoutproof
-#gettxoutsetinfo
-#preciousblock "blockhash"
-#pruneblockchain
-#verifychain ( checklevel nblocks )
-#verifytxoutproof "proof"
+# gettxoutproof
+# gettxoutsetinfo
+# preciousblock "blockhash"
+# pruneblockchain
+# verifychain ( checklevel nblocks )
+# verifytxoutproof "proof"
 
 # CONTROL
+
+
 @app.get("/api/blockchain/getinfo")
 def get_info():
     """
     DEPRECATED. Returns an object containing various state info.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getinfo")
         return data
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
-    
+
+
 @app.get("/api/blockchain/help")
 def help_all():
     """
     List all commands, or get help for a specified command.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("help")
         return data
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
+
+
 @app.get("/api/blockchain/help/{command}")
 async def help(command):
     """
     List all commands, or get help for a specified command.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
-    print (command)
+    print(command)
     try:
         if command == "":
             data = rpc.command("getinfo")
@@ -308,7 +336,8 @@ def get_net_totals():
     """
     Returns all transaction ids in memory pool as a json array of string transaction ids.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getnettotals")
@@ -317,84 +346,88 @@ def get_net_totals():
         raise HTTPException(status_code=418, detail="Something went wrong")
 
 
-#== Rawtransactions ==
-#createrawtransaction [{"txid":"id","vout":n},...] {"address":amount,"data":"hex",...} ( locktime )
-#fundrawtransaction "hexstring" ( options )
-#getrawtransaction "txid" ( verbose )
-#sendrawtransaction "hexstring" ( allowhighfees )
-#signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
+# == Rawtransactions ==
+# createrawtransaction [{"txid":"id","vout":n},...] {"address":amount,"data":"hex",...} ( locktime )
+# fundrawtransaction "hexstring" ( options )
+# getrawtransaction "txid" ( verbose )
+# sendrawtransaction "hexstring" ( allowhighfees )
+# signrawtransaction "hexstring" ( [{"txid":"id","vout":n,"scriptPubKey":"hex","redeemScript":"hex"},...] ["privatekey1",...] sighashtype )
 
 
-
-    
 @app.get("/api/rawtransactions/decoderawtransaction/{hexstring}")
 async def decode_rawtransaction(hexstring):
     """"
     Returns an Object with information about blockheader <hash>.
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("decoderawtransaction", params=[hexstring])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
+        # raise UnicornException(name="getbestblockhash")
+        print(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/rawtransactions/decodescript/{hexstring}")
 async def decode_script(hexstring):
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("decodescript", params=[hexstring])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
+        # raise UnicornException(name="getbestblockhash")
+        print(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/rawtransactions/getrawtransaction/{txid}")
 async def get_rawtransaction(txid):
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("getrawtransaction", params=[txid, True])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
+        # raise UnicornException(name="getbestblockhash")
+        print(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
+
 
 @app.get("/api/rawtransactions/sendrawtransaction/{hexstring}")
 async def send_rawtransaction(hexstring):
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("sendrawtransaction", params=[hexstring])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
+        # raise UnicornException(name="getbestblockhash")
+        print(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
-
-
 
 
 # UTIL
 @app.get("/api/rawtransactions/validateaddress/{address}")
 async def validate_address(address):
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
         data = rpc.command("validateaddress", params=[address])
         return data
     except Exception as e:
-        #raise UnicornException(name="getbestblockhash")
-        print (e)
+        # raise UnicornException(name="getbestblockhash")
+        print(e)
         raise HTTPException(status_code=418, detail="Something went wrong")
 
-	
+
 @app.post("/api/rawtransactions/verifymessage")
 def verify_message(verifyMessage: Verifymessage):
     """
@@ -414,20 +447,21 @@ def verify_message(verifyMessage: Verifymessage):
             "message": "To the moon (:"
         }'
     """
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(
+        config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     data = {}
     try:
-        data = rpc.command("verifymessage", params=[verifyMessage.address,verifyMessage.signature, verifyMessage.message])
+        data = rpc.command("verifymessage", params=[
+                           verifyMessage.address, verifyMessage.signature, verifyMessage.message])
         return data
     except Exception as e:
         raise HTTPException(status_code=418, detail="Something went wrong")
-        
 
 
 """
 @app.get("/api/test")
 def read_root():
-    rpc = RPC_Connection(rpcuser, rpcpassword, rpchost, rpcport)
+    rpc = RPC_Connection(config.RPC_USER, config.RPC_PASSWORD, config.RPC_HOST, config.RPC_PORT)
     try:
         data = rpc.command("getbestblockhash")
         return data
@@ -437,15 +471,12 @@ def read_root():
 """
 
 if __name__ == "__main__":
-    #uvicorn.run("main:app", host="0.0.0.0", port=80, log_level="debug", reload=True)
-    uvicorn.run("main:app",
-                host="0.0.0.0",
-                log_level="debug",
-                port=443,
-                reload=True
-                ,ssl_keyfile="C:\\Certbot\\live\\easypeasy.eastus.cloudapp.azure.com\\privkey.pem"
-                ,ssl_certfile="C:\\Certbot\\live\\easypeasy.eastus.cloudapp.azure.com\\fullchain.pem"
-                )
-
-    #freeze_support()
-    #uvicorn.run("main:app", host="0.0.0.0", port=8080, log_level="info", reload=False,workers=4,loop="asyncio",)
+    uvicorn.run(  # type: ignore
+        "main:app",
+        host=config.HOST,
+        log_level=config.LOG_LEVEL,
+        port=config.PORT,
+        reload=True if config.ENV == "DEV" else False,
+        ssl_keyfile=config.SSL_KEYFILE,
+        ssl_certfile=config.SSL_CERTFILE
+    )
