@@ -51,6 +51,21 @@ python main.py
 
 You will be able to access the documentation in your browser under the specified host and port.
 
+If you want to run the API as windows service use  ```srvwrapper``` like this:
+```sh
+# install srvwrapper
+pip install srvwrapper
+
+# create service
+srvwrapper dogeapi C:\python\python.exe --arguments "\\\"C:\ENTER_YOUR_PATH\main.py\\\"" --display "dogeapi" --description "Dogeapi Webservice" --start auto
+
+# start the service using "Services" app in windows
+
+# if you want to delete the service again use this command
+sc delete dogeapi
+```
+
+
 ## 🕶 See the results
 
 If you want to see the API "live" use this link: <https://easypeasy.eastus.cloudapp.azure.com/>
